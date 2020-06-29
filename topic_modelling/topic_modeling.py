@@ -63,7 +63,6 @@ def get_lda_topics(input_str, removable_words, num_of_topics, num_of_passes, sav
     output : dict of topics'''
 
     if save_models != dispaly:
-
         raise ValueError('save_models and dispaly parameters should be the same.')
         os.abort()
 
