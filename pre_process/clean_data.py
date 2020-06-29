@@ -18,6 +18,8 @@ from sklearn.feature_extraction.text import CountVectorizer
 from spacy.matcher import PhraseMatcher
 from spacy.util import minibatch
 from spacy.lang.en import English
+from nltk import word_tokenize, pos_tag
+
 
 
 nlp = spacy.load('en_core_web_sm')
@@ -72,6 +74,20 @@ def lemmatize_str(input_str):
     '''lemmatize words and phrases in a string'''
     return WordNetLemmatizer().lemmatize(input_str) 
 
+def get_nouns(input_str):
+    '''extract only the nouns from a string and return the updated string'''
+    is_noun = lambda pos: pos[:2] == 'NN'
+    tokenized = word_tokenize(input_str)
+    all_nouns = [word for (word, pos) in pos_tag(tokenized) if is_noun(pos)] 
+    return ' '.join(all_nouns)
+
+def get_nouns_adj(input_str):
+    '''extract only the nouns and adjectives from a string and return the updated string'''
+    is_noun_adj = lambda pos: pos[:2] == 'NN' or pos[:2] == 'JJ'
+    tokenized = word_tokenize(input_str)
+    nouns_adj = [word for (word, pos) in pos_tag(tokenized) if is_noun_adj(pos)] 
+    return ' '.join(nouns_adj)
+
 def to_dtm(input_df, text , remove_stop_words = 0):
     ''' create a document term matrix as a dataframe from an initial dataframe where the format is text, lable to label vs tokenized words
     input1 : data frame
@@ -112,7 +128,6 @@ def find_match_location(input_str, pattern_list):
 def cosine_similarity(a, b):
     '''run cosine text similarity test'''
     return a.dot(b)/np.sqrt(a.dot(a) * b.dot(b))
-
 
 def text_similarity(str1, str2, enable_large_model = 0):
     '''spacy text similarity metrics'''
