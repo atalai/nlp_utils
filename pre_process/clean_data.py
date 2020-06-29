@@ -89,7 +89,7 @@ def get_nouns_adj(input_str):
     return ' '.join(nouns_adj)
 
 def to_dtm(input_df, text , remove_stop_words = 0):
-    ''' create a document term matrix as a dataframe from an initial dataframe where the format is text, lable to label vs tokenized words
+    ''' create a document term matrix as a dataframe from an initial dataframe where the format is text, label to label vs tokenized words
     input1 : data frame
     input2 : column name with the raw text (usually preprocessed)
     input3 : remove english stop words in the process, deafult to 0'''
