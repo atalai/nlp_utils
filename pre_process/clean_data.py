@@ -11,15 +11,19 @@ import pickle
 import nltk
 import re
 import string
-import spacy 
+import spacy
+import pprint 
 import pandas as pd
+import numpy as np
 from nltk.stem import WordNetLemmatizer 
 from sklearn.feature_extraction.text import CountVectorizer
 from spacy.matcher import PhraseMatcher
 from spacy.util import minibatch
 from spacy.lang.en import English
 from nltk import word_tokenize, pos_tag
-
+from gensim import corpora
+from gensim.utils import simple_preprocess
+from gensim import matutils, models
 
 
 nlp = spacy.load('en_core_web_sm')
@@ -89,7 +93,7 @@ def get_nouns_adj(input_str):
     return ' '.join(nouns_adj)
 
 def to_dtm(input_df, text , remove_stop_words = 0):
-    ''' create a document term matrix as a dataframe from an initial dataframe where the format is text, label to label vs tokenized words
+    ''' create a document term matrix as a dataframe from an initial dataframe where the format is text, lable to label vs tokenized words
     input1 : data frame
     input2 : column name with the raw text (usually preprocessed)
     input3 : remove english stop words in the process, deafult to 0'''
@@ -124,6 +128,26 @@ def find_match_location(input_str, pattern_list):
     text_doc = nlp(input_str) 
     matches = matcher(text_doc)
     return matches
+
+
+def get_tfidf(input_str):
+    '''calculate Term Frequency-Inverse Document Frequency matrix on input_str, returns
+    sorted TF_IDF document'''
+    result = []
+    doc_list = [input_str]
+    doc_tokenized = [simple_preprocess(doc) for doc in doc_list]
+    dictionary = corpora.Dictionary()
+    BoW_corpus = [dictionary.doc2bow(doc, allow_update=True) for doc in doc_tokenized]
+    tfidf = models.TfidfModel(BoW_corpus, smartirs='ntc')
+
+    for doc in tfidf[BoW_corpus]:
+       result.append([[dictionary[id], np.around(freq,decimals=2)] for id, freq in doc])
+
+    result = result[0]
+    sorted_result = sorted(result, key = lambda x: (x[1]) , reverse = True)
+
+    return sorted_result
+
 
 def cosine_similarity(a, b):
     '''run cosine text similarity test'''
