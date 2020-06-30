@@ -1,5 +1,5 @@
 #   @@@@@@@@@@@@@@@@@@@@@@@@
-#   **Code enriched by Aron Talai****
+#   **Code by Aron Talai****
 #   @@@@@@@@@@@@@@@@@@@@@@@@
 
 
@@ -34,7 +34,8 @@ from spacy.lang.en import English
 spacy.load('en')
 parser = English()
 
-    
+
+# def funcs    
 def tokenize(text):
     '''tokenize the input string'''
     lda_tokens = []
@@ -63,6 +64,7 @@ def get_lda_topics(input_str, removable_words, num_of_topics, num_of_passes, sav
     output : dict of topics'''
 
     if save_models != dispaly:
+
         raise ValueError('save_models and dispaly parameters should be the same.')
         os.abort()
 
@@ -91,5 +93,79 @@ def get_lda_topics(input_str, removable_words, num_of_topics, num_of_passes, sav
         lda = gensim.models.ldamodel.LdaModel.load('topic_modeling_model.gensim')
         lda_display = pyLDAvis.gensim.prepare(lda, corpus, dictionary, sort_topics=False)
         pyLDAvis.show(lda_display)
+
+    return topics
+
+
+
+def get_lsi_topics(input_str, removable_words, num_of_topics, save_models = 0, dispaly = 0):
+    '''run LSI topic modelling on an input string
+    input1 : input string
+    input2 : list of removable words 
+    input3 : number of topics to explore
+    input4 : to save the model meta or not, deafault to 0
+    input5 : to display the topic model using pyLDAvis, throws and error if save_models != dispaly 
+    output : dict of topics
+
+    *notes: pyLDAvis functinality not working properly --fix later'''
+
+    if save_models != dispaly:
+
+        raise ValueError('save_models and dispaly parameters should be the same.')
+        os.abort()
+
+    #Prepare data for LSI analysis
+    data = prepare_text_for_lda(input_str, removable_words)
+    text_data = [[data[i]] for i in range(0,len(data))]
+    dictionary = corpora.Dictionary(text_data)
+    corpus = [dictionary.doc2bow(text) for text in text_data]
+
+    # LSI Model
+    lsimodel = gensim.models.lsimodel.LsiModel(corpus, num_topics = num_of_topics, id2word = dictionary)
+
+
+    topics = lsimodel.print_topics(num_words=4)
+
+    for topic in topics:
+        print(topic)
+
+    if save_models:
+        pickle.dump(corpus, open('topic_modeling_corpus.pkl', 'wb'))
+        dictionary.save('topic_modeling_dictionary.gensim')
+        lsimodel.save('topic_modeling_model.gensim')
+
+    if dispaly:
+        # load models
+        dictionary = gensim.corpora.Dictionary.load('topic_modeling_dictionary.gensim')
+        corpus = pickle.load(open('topic_modeling_corpus.pkl', 'rb'))
+        lsi = gensim.models.lsimodel.LsiModel.load('topic_modeling_model.gensim')
+
+        #lsi_display = pyLDAvis.gensim.prepare(lsi, corpus, dictionary, sort_topics=False)
+        lsi_display = pyLDAvis.gensim.prepare(lsi, corpus, dictionary)
+
+        pyLDAvis.show(lsi_display)
+
+    return topics
+
+def get_hdp_topics(input_str, removable_words):
+    '''run HDP topic modelling on an input string
+    input1 : input string
+    input2 : list of removable words 
+    output : dict of topics
+    *notes: hdp has multiple hyper-parameters that need to be fine tuned. Use function as template only'''
+
+    #Prepare data for LDA analysis
+    data = prepare_text_for_lda(input_str, removable_words)
+    text_data = [[data[i]] for i in range(0,len(data))]
+    dictionary = corpora.Dictionary(text_data)
+    corpus = [dictionary.doc2bow(text) for text in text_data]
+
+    # HDP Model
+    hdp_model = gensim.models.hdpmodel.HdpModel(corpus, id2word = dictionary)
+
+    topics = hdp_model.print_topics(num_words=4)
+
+    for topic in topics:
+        print(topic)
 
     return topics
