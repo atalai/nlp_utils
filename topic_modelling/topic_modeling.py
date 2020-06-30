@@ -154,7 +154,7 @@ def get_hdp_topics(input_str, removable_words):
     output : dict of topics
     *notes: hdp has multiple hyper-parameters that need to be fine tuned. Use function as template only'''
 
-    #Prepare data for LDA analysis
+    #Prepare data for HDP analysis
     data = prepare_text_for_lda(input_str, removable_words)
     text_data = [[data[i]] for i in range(0,len(data))]
     dictionary = corpora.Dictionary(text_data)
