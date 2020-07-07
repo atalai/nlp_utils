@@ -67,8 +67,12 @@ def remove_single_char_start(input_str):
     return re.sub(r'\^[a-zA-Z]\s+', ' ', input_str) 
 
 def remove_prefix_b(input_str):
-    ''' Removing prefixed 'b'''
+    ''' remove prefixed 'b'''
     return re.sub(r'^b\s+', '', input_str)
+
+def remove_lenght2(input_str):
+    ''' remove words of length 2 in a string'''
+    return re.sub(r'\b\w{1,2}\b', '', input_str)
 
 def remove_accented(input_str):
     """remove accented characters from text, e.g. café, seems to wreck spacy conda installation"""
